@@ -15,12 +15,6 @@ pipeline {
             }
         }
 
-        stage('Build Spring Boot App') {
-            steps {
-                sh 'mvn clean package -DskipTests'
-            }
-        }
-
         stage('Build & Push Docker Image') {
             steps {
                 withCredentials([string(credentialsId: 'docker-cerds', variable: 'DOCKER_HUB_PASS')]) {
