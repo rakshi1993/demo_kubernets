@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-app
+  labels:
+    app: spring-app
+
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: spring-app
+
+  template:
+    metadata:
+      labels:
+        app: spring-app
+
+    spec:
+      containers:
+        - name: spring-container
+          image: rakshith01/spring-success-app:latest
+          ports:
+            - containerPort: 8080
+
+          readinessProbe:
+            httpGet:
+              path: /success
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /success
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
