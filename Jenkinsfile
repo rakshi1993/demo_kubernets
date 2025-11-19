@@ -18,11 +18,11 @@ pipeline {
         stage('Build & Push Docker Image') {
             steps {
                 withCredentials([string(credentialsId: 'docker-cerds', variable: 'DOCKER_HUB_PASS')]) {
-                    sh """
-                        echo "$DOCKER_HUB_PASS" | docker login -u ${DOCKER_HUB_USER} --password-stdin
-                        docker build -t ${DOCKER_HUB_USER}/spring-success-app:latest .
-                        docker push ${DOCKER_HUB_USER}/spring-success-app:latest
-                    """
+                    sh '''
+                        echo "$DOCKER_HUB_PASS" | docker login -u rakshith01 --password-stdin
+                        docker build -t rakshith01/spring-success-app:latest .
+                        docker push rakshith01/spring-success-app:latest
+                    '''
                 }
             }
         }
@@ -32,40 +32,44 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                   credentialsId: 'aws_credentials']]) {
 
-                    sh """
-                        aws eks --region ${AWS_REGION} update-kubeconfig --name ${EKS_CLUSTER}
+                    sh '''
+                        aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
                         kubectl apply -f k8s/
-                    """
+                    '''
                 }
             }
         }
 
         stage('Get LoadBalancer URL') {
             steps {
-                script {
-                    sh '''
-                        echo "⏳ Waiting for LoadBalancer external URL..."
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                  credentialsId: 'aws_credentials']]) {
 
-                        # Try for up to 5 minutes (30 × 10s)
-                        for i in {1..30}; do
-                            LB_URL=$(kubectl get svc spring-service -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+                    script {
+                        sh '''
+                            echo "⏳ Waiting for LoadBalancer external URL..."
 
-                            if [ ! -z "$LB_URL" ]; then
-                                echo "-------------------------------------------------------"
-                                echo "🎉 Deployment Successful!"
-                                echo "Your Spring Boot Application is Live At:"
-                                echo "👉 http://$LB_URL/success"
-                                echo "-------------------------------------------------------"
-                                exit 0
-                            fi
+                            # Try for up to 5 minutes (30 × 10s)
+                            for i in {1..30}; do
+                                LB_URL=$(kubectl get svc spring-service -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 
-                            echo "Still waiting for LoadBalancer... retrying in 10s"
-                            sleep 10
-                        done
+                                if [ ! -z "$LB_URL" ]; then
+                                    echo "-------------------------------------------------------"
+                                    echo "🎉 Deployment Successful!"
+                                    echo "Your Spring Boot Application is Live At:"
+                                    echo "👉 http://$LB_URL/success"
+                                    echo "-------------------------------------------------------"
+                                    exit 0
+                                fi
 
-                        echo "❌ ERROR: LoadBalancer URL not available yet."
-                        exit 1
-                    '''
+                                echo "Still waiting for LoadBalancer... retrying in 10s"
+                                sleep 10
+                            done
+
+                            echo "❌ ERROR: LoadBalancer URL not available yet."
+                            exit 1
+                        '''
+                    }
                 }
             }
         }
