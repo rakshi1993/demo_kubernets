@@ -25,14 +25,14 @@ spec:
 
           readinessProbe:
             httpGet:
-              path: /success
+              path: /pod
               port: 8080
             initialDelaySeconds: 10
             periodSeconds: 5
 
           livenessProbe:
             httpGet:
-              path: /success
+              path: /pod
               port: 8080
             initialDelaySeconds: 15
             periodSeconds: 10
