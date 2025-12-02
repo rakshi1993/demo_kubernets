@@ -47,7 +47,7 @@ pipeline {
 
                     script {
                         sh '''
-                            echo "⏳ Waiting for LoadBalancer external URL..."
+                            echo "Waiting for LoadBalancer external URL..."
 
                             # Try for up to 5 minutes (30 × 10s)
                             for i in {1..30}; do
@@ -55,9 +55,9 @@ pipeline {
 
                                 if [ ! -z "$LB_URL" ]; then
                                     echo "-------------------------------------------------------"
-                                    echo "🎉 Deployment Successful!"
+                                    echo " Deployment Successful!"
                                     echo "Your Spring Boot Application is Live At:"
-                                    echo "👉 http://$LB_URL/pod"
+                                    echo " http://$LB_URL/pod"
                                     echo "-------------------------------------------------------"
                                     exit 0
                                 fi
@@ -66,7 +66,7 @@ pipeline {
                                 sleep 10
                             done
 
-                            echo "❌ ERROR: LoadBalancer URL not available yet."
+                            echo " ERROR: LoadBalancer URL not available yet."
                             exit 1
                         '''
                     }
@@ -77,10 +77,10 @@ pipeline {
 
     post {
         failure {
-            echo "🚨 Pipeline Failed!"
+            echo " Pipeline Failed!"
         }
         success {
-            echo "✅ Pipeline Completed Successfully!"
+            echo " Pipeline Completed Successfully!"
         }
     }
 }
