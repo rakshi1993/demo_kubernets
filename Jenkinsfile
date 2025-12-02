@@ -57,7 +57,7 @@ pipeline {
                                     echo "-------------------------------------------------------"
                                     echo "🎉 Deployment Successful!"
                                     echo "Your Spring Boot Application is Live At:"
-                                    echo "👉 http://$LB_URL/success"
+                                    echo "👉 http://$LB_URL/pod"
                                     echo "-------------------------------------------------------"
                                     exit 0
                                 fi
